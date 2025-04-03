@@ -1,4 +1,16 @@
 import requests
+
+from dotenv import load_dotenv
+
+import os
+
+import awswrangler as wr
+
+import boto3 
+
+import pandas as pd
+
+
 url = 'http://api.football-data.org/v4/competitions/'
 response = requests.get(url)
 
@@ -22,27 +34,8 @@ def list_of_competition():
 
 
 list_a = list_of_competition()
-#print(list_a)
 
-
-import pandas as pd
 data_df = pd.DataFrame(list_a)
-
-
-data_df.to_csv('test1.csv', index = False)
-
-
-from dotenv import load_dotenv
-import os
-import awswrangler as wr
-import boto3 
-
-
-
-file="test1.csv"
-
-
-
 
 session = boto3.Session(
 aws_access_key_id=os.getenv('aws_access_key'),
@@ -50,10 +43,12 @@ aws_secret_access_key=os.getenv('aws_secret_key'),
 region_name = os.getenv('region')
 )
 
-wr.s3.to_parquet(
+
+
+wr.s3.to_csv(
     df=data_df,
-    path="s3://tolufile/competition/",
+    path="s3://tolufile/competition/tolubucket.csv",
     boto3_session=session,
     mode="append",
-    dataset=True 
+    dataset=True
    )
